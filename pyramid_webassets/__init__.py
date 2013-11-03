@@ -26,7 +26,14 @@ class PyramidResolver(Resolver):
         else:
             return (None, item)
 
+    @property
+    def use_webassets_system_for_sources(self):
+        return bool(self.env.load_path)
+
     def search_for_source(self, item):
+        if self.use_webassets_system_for_sources:
+            return super(PyramidResolver, self).search_for_source(item)
+
         package, filepath = self._split_asset_spec(item)
         if package is None:
             return super(PyramidResolver, self).search_for_source(filepath)
@@ -167,6 +174,9 @@ def get_webassets_env_from_settings(settings, prefix='webassets'):
         kwargs['cache_max_age'] = int(kwargs.pop('cache_max_age'))
     else:
         kwargs['cache_max_age'] = None
+
+    if 'load_path' in kwargs:
+        kwargs['load_path'] = kwargs['load_path'].split()
 
     assets_env = Environment(asset_dir, asset_url, **kwargs)
 

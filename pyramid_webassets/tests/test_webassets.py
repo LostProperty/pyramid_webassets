@@ -451,3 +451,15 @@ class TestAssetSpecs(TempDirHelper, unittest.TestCase):
 
         urls = bundle.urls(self.env)
         assert urls == ['http://static.example.com/zung.css']
+
+    def test_use_load_path_if_defined(self):
+        from pyramid_webassets import get_webassets_env_from_settings
+
+        settings = {
+            'webassets.base_url': '/static',
+            'webassets.base_dir': os.getcwd(),
+            'webassets.load_path': '\n/foo\n/bar'
+        }
+
+        env = get_webassets_env_from_settings(settings)
+        assert env.load_path == ['/foo', '/bar']
